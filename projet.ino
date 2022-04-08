@@ -14,20 +14,24 @@ void update();
 void setup()
 {
     lcd.begin(16, 2);
-    lcd.createChar(1, vaisseau);
+    lcd.createChar(0, vaisseau);
+    lcd.createChar(1, obstacle);
     attachInterrupt(digitalPinToInterrupt(2), movePlayer, FALLING);
 }
 
-Player player = Player({0, 0}, 0, 100, 1);
-ObstacleIndestructible aa = ObstacleIndestructible({8, 0});
-SpaceList spaceList = SpaceList();
-spaceList.addEntity(aa);
+Player player = Player({0, 0}, 0, 100, 0);
+ObstacleIndestructible obin = ObstacleIndestructible({8, 0}, 1);
+ObstacleAgressif obag = ObstacleAgressif({10, 1}, 1);
+// SpaceList spaceList = SpaceList();
+// spaceList.addEntity(aa);
 
 void loop()
 {
     if (gameState == PLAY)
     {
         show(player);
+        show(obin);
+        show(obag);
     }
 }
 
@@ -38,9 +42,12 @@ void movePlayer()
 
 void show(Entity entity)
 {
-    // On clear l'ancienne pos
-    lcd.setCursor(entity.previousPos.x, entity.previousPos.y);
-    lcd.print(' ');
+    if (entity.previousPos.x != entity.pos.x || entity.previousPos.y != entity.pos.y) // Si on a bougé depuis le dernier tick
+    {
+        // On clear l'ancienne pos
+        lcd.setCursor(entity.previousPos.x, entity.previousPos.y);
+        lcd.print(' ');
+    }
 
     // On affiche la nouvelle
     lcd.setCursor(entity.pos.x, entity.pos.y);
