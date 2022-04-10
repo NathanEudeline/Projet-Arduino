@@ -3,5 +3,5 @@
     "board": "arduino:avr:diecimila",
     "programmer": "arduino:avrisp",
     "port": "COM9",
-    "sketch": "projet.ino"
+    "sketch": "Projet-Arduino.ino"
 }

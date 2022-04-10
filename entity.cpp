@@ -1,5 +1,20 @@
+#include <LiquidCrystal.h>
 #include "entity.h"
 #include "structs.h"
+
+void Entity::render(LiquidCrystal lcd)
+{
+    if (this->previousPos.x != this->pos.x || this->previousPos.y != this->pos.y) // Si on a bougé depuis le dernier tick
+    {
+        // On clear l'ancienne pos
+        lcd.setCursor(this->previousPos.x, this->previousPos.y);
+        lcd.print(' ');
+    }
+
+    // On affiche la nouvelle
+    lcd.setCursor(this->pos.x, this->pos.y);
+    lcd.write(this->modelId);
+}
 
 void Player::move()
 {
@@ -7,39 +22,16 @@ void Player::move()
     this->pos.y = (this->pos.y == 1) ? 0 : 1;
 }
 
-void Player::toggleAttack()
+void Player::shoot()
 {
-    this->attaque = !this->attaque;
+    this->attaque = true;
 }
 
-// void SpaceList::addEntity(SpaceEntity entity)
-// {
-//     this->list[this->size] = realloc(this->list, sizeof(this->list) + sizeof(entity));
-//     this->list[this->size] = entity;
-
-//     this->size++;
-// }
-
-// void SpaceList::removeEntity(SpaceEntity entity)
-// {
-//     for (int i = 0; i < this->size; i++)
-//     {
-//         if (this->list[i].id == entity.id)
-//         {
-//             if (i == this->size - 1) // Derniere pos
-//             {
-//                 this->size--;
-//             }
-//             else
-//             {
-//                 for (int j = i; j < this->size; j++)
-//                 {
-//                     this->list[j] = this->list[j + 1];
-//                 }
-
-//                 this->size--;
-//             }
-//             return;
-//         }
-//     }
-// }
+void SpaceList::updateEntities(Player player, unsigned long millis)
+{
+    for (int i = 0; i < this->size; i++)
+    {
+        SpaceEntity entity = this->list[i];
+        entity.update();
+    }
+}
