@@ -77,7 +77,7 @@ public:
 
     void removeEntity(SpaceEntity *entity);
 
-    void updateEntities(Player player, unsigned long millis);
+    void updateEntities(Player *player, unsigned long millis);
 
     void renderEntities(LiquidCrystal lcd);
 };

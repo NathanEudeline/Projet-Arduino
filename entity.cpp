@@ -50,7 +50,7 @@ bool SpaceEntity::testCol(Entity entity)
     return (this->pos.x == entity.pos.x && this->pos.y == entity.pos.y);
 }
 
-void SpaceList::updateEntities(Player player, unsigned long millis)
+void SpaceList::updateEntities(Player *player, unsigned long millis)
 {
     for (int i = 0; i < this->size; i++)
     {
@@ -61,9 +61,9 @@ void SpaceList::updateEntities(Player player, unsigned long millis)
             entity->attaque = false;
             this->addEntity(&SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true));
         }
-        if (entity->type == POINT_TYPE && entity->testCol(player))
+        if (entity->type == POINT_TYPE && entity->testCol(*player))
         {
-            player.score += 10;
+            player->score += 10;
         }
 
         for (int j = 0; j < this->size; j++)
