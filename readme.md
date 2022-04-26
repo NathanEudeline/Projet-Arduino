@@ -82,13 +82,13 @@ interceptant à distance les [OBSTACLE_AGRESSIF] avec votre rayon laser.
     - 1 Potentiomètre
     - 1 Ecran lcd
       - 16 x 2 Charactères
-        - 8 Charactère originaux par frame max
-          - Charactère originaux de 5 x 8 pixels
+        - 8 Caractère originaux par frame max
+          - Caractère originaux de 5 x 8 pixels
 
-- ### Developpement
+- ### Développement
 
-  - 8 Charactère originaux par frame max
-    - Utilisation de C++ sans toute les librairies standard
+  - 8 Caractère originaux par frame max
+    - Utilisation de C++ sans toutes les librairies standard
 
 ---
 
@@ -101,7 +101,7 @@ interceptant à distance les [OBSTACLE_AGRESSIF] avec votre rayon laser.
 
 ---
 
-- _**Personne**_
+- _**Personnes**_
   - [x] Nathan
   - [x] Rémi
   - [x] Dimitri

@@ -1,5 +1,8 @@
 #pragma once
 
+#define KILL_PTS 10
+#define HIT_DMG 1
+
 enum GameState
 {
     ACCUEIL,
@@ -19,9 +22,10 @@ enum ModelId
 {
     PLAYER_MODEL,
     OBSTACLE_MODEL,
-    ENNEMI_MODEL,
+    ENEMY_MODEL,
     POINT_MODEL,
-    HEART_MODEL,
+    HEART_FULL_MODEL,
+    HEART_EMPTY_MODEL,
     EXPLOSION_MODEL,
     MISSILE_MODEL
 };

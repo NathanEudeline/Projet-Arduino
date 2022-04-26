@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>
+#include <stdlib.h>
 #include "entity.h"
 
 void Entity::render(LiquidCrystal lcd)
@@ -34,15 +35,19 @@ void SpaceEntity::move()
 
 void SpaceEntity::update(unsigned long millis)
 {
-    if (this->lastMove + (rand() % 1000) + 5000 > millis)
+    if (this->type != MISSILE_TYPE && this->lastMove + (rand() % 1000) + 5000 > millis)
     {
-        this->lastMove = millis;
         this->move();
         if (this->type == ENNEMI_TYPE && millis % 2 == 0)
         {
             this->attaque = true;
         }
     }
+    if (this->type == MISSILE_TYPE && this->lastMove + (rand() % 500) + 3000 > millis)
+    {
+        this->move();
+    }
+    this->lastMove = millis;
 }
 
 bool SpaceEntity::testCol(Entity entity)
@@ -52,27 +57,54 @@ bool SpaceEntity::testCol(Entity entity)
 
 void SpaceList::updateEntities(Player *player, unsigned long millis)
 {
-    for (int i = 0; i < this->size; i++)
+    for (int i = 0; i < this->size; i++) // On boucle sur tt les entité du tableau
     {
         SpaceEntity *entity = this->list[i];
-        entity->update(millis);
-        if (entity->attaque)
+        entity->update(millis); // on update l'entité
+        if (entity->pos.x < 0)  // On la vire si elle sort du jeu en on continue pas la logique
+        {
+            this->removeEntity(entity);
+            continue;
+        }
+
+        if (entity->attaque) // si l'entité a son attaque en true on spawn un missile
         {
             entity->attaque = false;
             this->addEntity(&SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true));
         }
-        if (entity->type == POINT_TYPE && entity->testCol(*player))
+        if (entity->testCol(*player))
         {
-            player->score += 10;
+            if (entity->type == POINT_TYPE)
+            {
+                player->score += KILL_PTS;
+            }
+            else
+            {
+                player->hp--;
+            }
         }
 
-        for (int j = 0; j < this->size; j++)
+        if (entity->type == MISSILE_TYPE)
         {
-            SpaceEntity *entityBis = this->list[j];
-
-            if (entity->type == MISSILE_TYPE && entity->testCol(*entityBis) && i != j && entityBis->type != OBSTACLE_TYPE)
+            for (int j = 0; j < this->size; j++)
             {
-                this->removeEntity(entityBis);
+                if (i != j)
+                    continue;
+
+                SpaceEntity *entityBis = this->list[j];
+
+                if (entity->testCol(*entityBis))
+                {
+                    if (entityBis->type != OBSTACLE_TYPE)
+                    {
+                        this->removeEntity(entity);
+                    }
+                    else
+                    {
+                        this->removeEntity(entityBis);
+                    }
+                    break;
+                }
             }
         }
     }
