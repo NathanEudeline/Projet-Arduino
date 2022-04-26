@@ -34,7 +34,15 @@ void SpaceEntity::move()
 
 void SpaceEntity::update(unsigned long millis)
 {
-    this->move();
+    if (this->lastMove + (rand() % 1000) + 5000 > millis)
+    {
+        this->lastMove = millis;
+        this->move();
+        if (this->type == ENNEMI_TYPE && millis % 2 == 0)
+        {
+            this->attaque = true;
+        }
+    }
 }
 
 bool SpaceEntity::testCol(Entity entity)
@@ -50,6 +58,7 @@ void SpaceList::updateEntities(Player player, unsigned long millis)
         entity->update(millis);
         if (entity->attaque)
         {
+            entity->attaque = false;
             this->addEntity(&SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true));
         }
         if (entity->type == POINT_TYPE && entity->testCol(player))
@@ -66,6 +75,15 @@ void SpaceList::updateEntities(Player player, unsigned long millis)
                 this->removeEntity(entityBis);
             }
         }
+    }
+}
+
+void SpaceList::renderEntities(LiquidCrystal lcd)
+{
+    for (int i = 0; i < this->size; i++)
+    {
+        SpaceEntity *entity = this->list[i];
+        entity->render(lcd);
     }
 }
 

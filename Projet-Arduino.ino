@@ -34,6 +34,7 @@ void loop()
     {
         if (player.attaque)
         {
+            player.attaque = false;
             list.addEntity(&SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false));
         }
         list.updateEntities(player, millis());

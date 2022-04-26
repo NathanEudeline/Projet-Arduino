@@ -44,6 +44,7 @@ public:
     bool direction;
     EntityType type;
     bool attaque;
+    unsigned long lastMove;
 
     SpaceEntity(vec2 pos, ModelId modelId, EntityType type, bool direction) : Entity(pos, modelId)
     {
@@ -51,6 +52,7 @@ public:
         this->direction = direction;
         this->type = type;
         this->attaque = false;
+        this->lastMove = 0;
     }
     SpaceEntity();
 
@@ -76,4 +78,6 @@ public:
     void removeEntity(SpaceEntity *entity);
 
     void updateEntities(Player player, unsigned long millis);
+
+    void renderEntities(LiquidCrystal lcd);
 };
