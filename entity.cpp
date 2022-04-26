@@ -1,6 +1,5 @@
 #include <LiquidCrystal.h>
 #include "entity.h"
-#include "structs.h"
 
 void Entity::render(LiquidCrystal lcd)
 {
@@ -27,11 +26,73 @@ void Player::shoot()
     this->attaque = true;
 }
 
+void SpaceEntity::move()
+{
+    this->previousPos = this->pos; // on stocke la pos précédente avant de bouger
+    this->pos.x += this->direction ? -1 : 1;
+}
+
+void SpaceEntity::update(unsigned long millis)
+{
+    this->move();
+}
+
+bool SpaceEntity::testCol(Entity entity)
+{
+    return (this->pos.x == entity.pos.x && this->pos.y == entity.pos.y);
+}
+
 void SpaceList::updateEntities(Player player, unsigned long millis)
 {
     for (int i = 0; i < this->size; i++)
     {
-        SpaceEntity entity = this->list[i];
-        entity.update();
+        SpaceEntity *entity = this->list[i];
+        entity->update(millis);
+        if (entity->attaque)
+        {
+            this->addEntity(&SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true));
+        }
+        if (entity->type == POINT_TYPE && entity->testCol(player))
+        {
+            player.score += 10;
+        }
+
+        for (int j = 0; j < this->size; j++)
+        {
+            SpaceEntity *entityBis = this->list[j];
+
+            if (entity->type == MISSILE_TYPE && entity->testCol(*entityBis) && i != j && entityBis->type != OBSTACLE_TYPE)
+            {
+                this->removeEntity(entityBis);
+            }
+        }
+    }
+}
+
+void SpaceList::addEntity(SpaceEntity *entity)
+{
+    this->list[this->size] = entity;
+}
+
+void SpaceList::removeEntity(SpaceEntity *entity)
+{
+    for (int i = 0; i < this->size; i++)
+    {
+        if (this->list[i] == entity)
+        {
+            if (i == this->size - 1) // Derniere pos
+            {
+                this->size--;
+            }
+            else
+            {
+                for (int j = i; j < this->size; j++)
+                {
+                    this->list[j] = this->list[j + 1];
+                }
+                this->size--;
+            }
+            return;
+        }
     }
 }

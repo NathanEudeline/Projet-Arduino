@@ -1,11 +1,10 @@
 #pragma once
-#include <stdlib.h>
 #include "structs.h"
 #include "game.h"
 
 #define MAX_ENTITY 10
 
-class Entity
+class Entity // Classe de base des entités
 {
 public:
     vec2 pos, previousPos;
@@ -19,24 +18,6 @@ public:
     }
 
     void render(LiquidCrystal lcd);
-};
-
-class SpaceEntity : public Entity // Contient les entités qui vont vers le joueur
-{
-public:
-    int id;
-    bool direction;
-    EntityType type;
-
-    SpaceEntity(vec2 pos, ModelId modelId, EntityType type, bool direction) : Entity(pos, modelId)
-    {
-        this->id = rand();
-        this->direction = direction;
-        this->type = type;
-    }
-    SpaceEntity();
-
-    bool update();
 };
 
 class Player : public Entity
@@ -56,11 +37,33 @@ public:
     void shoot();
 };
 
+class SpaceEntity : public Entity // Contient les entités qui vont vers le joueur
+{
+public:
+    int id;
+    bool direction;
+    EntityType type;
+    bool attaque;
+
+    SpaceEntity(vec2 pos, ModelId modelId, EntityType type, bool direction) : Entity(pos, modelId)
+    {
+        this->id = rand();
+        this->direction = direction;
+        this->type = type;
+        this->attaque = false;
+    }
+    SpaceEntity();
+
+    void update(unsigned long millis);
+    void move();
+    bool testCol(Entity entity);
+};
+
 class SpaceList // Contient les SpaceEntity actives
 {
 private:
     int size;
-    SpaceEntity list[MAX_ENTITY];
+    SpaceEntity *list[MAX_ENTITY];
 
 public:
     SpaceList()
@@ -68,9 +71,9 @@ public:
         this->size = 0;
     }
 
-    void addEntity(SpaceEntity entity);
+    void addEntity(SpaceEntity *entity);
 
-    void removeEntity(SpaceEntity entity);
+    void removeEntity(SpaceEntity *entity);
 
     void updateEntities(Player player, unsigned long millis);
 };

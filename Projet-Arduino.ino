@@ -1,6 +1,6 @@
 #include <LiquidCrystal.h>
-#include "entity.h"
 #include "game.h"
+#include "entity.h"
 #include "structs.h"
 #include "texture.h"
 
@@ -24,8 +24,8 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(1), playerShoot, FALLING);
 
     // Game declaration //
-    list.addEntity(obag);
-    list.addEntity(obin);
+    list.addEntity(&obag);
+    list.addEntity(&obin);
 }
 
 void loop()
@@ -34,7 +34,7 @@ void loop()
     {
         if (player.attaque)
         {
-            list.addEntity(SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false));
+            list.addEntity(&SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false));
         }
         list.updateEntities(player, millis());
     }

@@ -3,9 +3,9 @@
     "configurations": [
         {
             "name": "Win32",
-            "compilerPath": "",
+            "compilerPath": "C:/MinGW/bin/gcc.exe",
             "compilerArgs": [],
-            "intelliSenseMode": "",
+            "intelliSenseMode": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
