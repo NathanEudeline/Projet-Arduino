@@ -1,16 +1,16 @@
 #include <LiquidCrystal.h>
+#include <stdlib.h>
 #include "game.h"
 #include "entity.h"
 #include "structs.h"
 #include "texture.h"
-#include <stdlib.h>
 
 void renderMenu();
 void renderOver();
 void renderHUD(Player player);
 void entitySpawner(SpaceList *list);
 
-GameState gameState = PLAY;
+GameState gameState = ACCUEIL;
 
 LiquidCrystal lcd(15, 14, 4, 5, 6, 7);
 
@@ -18,6 +18,8 @@ Player player = Player({0, 0}, 0, 3);
 SpaceList list = SpaceList();
 
 unsigned long lastSpawnTime = 0;
+double difficulty = 1;
+int brouillard = 0;
 
 void setup()
 {
@@ -40,6 +42,7 @@ void setup()
 
 void loop()
 {
+    brouillard = analogRead(3) / 113;
     if (gameState == ACCUEIL)
     {
         renderMenu();
@@ -47,17 +50,20 @@ void loop()
 
     if (gameState == PLAY)
     {
+        difficulty += 0.01;
         if (player.attaque)
         {
             player.attaque = false;
             list.addEntity(&SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false));
         }
-        list.updateEntities(&player, millis());
+        list.updateEntities(&player, millis(), difficulty);
 
         if (player.hp <= 0)
             gameState = DEAD;
 
+        player.render(lcd);
         list.renderEntities(lcd);
+        renderFog(brouillard);
         renderHUD(player);
 
         if (lastSpawnTime + 4000 < millis())
@@ -69,8 +75,6 @@ void loop()
 
     if (gameState == DEAD)
     {
-        renderHUD(player);
-
         renderOver();
     }
 }
@@ -115,6 +119,8 @@ void renderMenu()
 
 void renderOver()
 {
+    lcd.clear();
+    lcd.print("Miskin");
 }
 
 void renderHUD(Player player)
@@ -159,4 +165,15 @@ void entitySpawner(SpaceList *list)
         break;
     }
     list->addEntity(&newEntity);
+}
+
+void renderFog(int fog)
+{
+    for (int i = 12; i > 12 - fog; i--)
+    {
+        lcd.setCursor(i, 0);
+        lcd.print(177);
+        lcd.setCursor(i, 1);
+        lcd.print(177);
+    }
 }

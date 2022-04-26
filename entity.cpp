@@ -33,9 +33,9 @@ void SpaceEntity::move()
     this->pos.x += this->direction ? -1 : 1;
 }
 
-void SpaceEntity::update(unsigned long millis)
+void SpaceEntity::update(unsigned long millis, double diff)
 {
-    if (this->type != MISSILE_TYPE && this->lastMove + (rand() % 1000) + 5000 > millis)
+    if (this->type != MISSILE_TYPE && this->lastMove + (rand() % 1000) + 5000 * diff > millis)
     {
         this->move();
         if (this->type == ENNEMI_TYPE && millis % 2 == 0)
@@ -55,13 +55,13 @@ bool SpaceEntity::testCol(Entity entity)
     return (this->pos.x == entity.pos.x && this->pos.y == entity.pos.y);
 }
 
-void SpaceList::updateEntities(Player *player, unsigned long millis)
+void SpaceList::updateEntities(Player *player, unsigned long millis, double diff)
 {
     for (int i = 0; i < this->size; i++) // On boucle sur tt les entité du tableau
     {
         SpaceEntity *entity = this->list[i];
-        entity->update(millis); // on update l'entité
-        if (entity->pos.x < 0)  // On la vire si elle sort du jeu en on continue pas la logique
+        entity->update(millis, diff); // on update l'entité
+        if (entity->pos.x < 0)        // On la vire si elle sort du jeu en on continue pas la logique
         {
             this->removeEntity(entity);
             continue;
@@ -102,6 +102,7 @@ void SpaceList::updateEntities(Player *player, unsigned long millis)
                     else
                     {
                         this->removeEntity(entityBis);
+                        this->removeEntity(entity);
                     }
                     break;
                 }

@@ -56,7 +56,7 @@ public:
     }
     SpaceEntity();
 
-    void update(unsigned long millis);
+    void update(unsigned long millis, double diff);
     void move();
     bool testCol(Entity entity);
 };
@@ -77,7 +77,7 @@ public:
 
     void removeEntity(SpaceEntity *entity);
 
-    void updateEntities(Player *player, unsigned long millis);
+    void updateEntities(Player *player, unsigned long millis, double diff);
 
     void renderEntities(LiquidCrystal lcd);
 };

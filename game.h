@@ -15,7 +15,8 @@ enum EntityType
     OBSTACLE_TYPE,
     ENNEMI_TYPE,
     POINT_TYPE,
-    MISSILE_TYPE
+    MISSILE_TYPE,
+    EXPLOSION_TYPE
 };
 
 enum ModelId

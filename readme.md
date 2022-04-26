@@ -92,9 +92,7 @@ interceptant à distance les [OBSTACLE_AGRESSIF] avec votre rayon laser.
 
 ---
 
-## Journal d'avancement
-
-### **Vendredi 1er Avril** _(01/04/22)_
+## Compte rendu
 
 - _**Materiel**_
   - [x] Arduino
@@ -122,3 +120,7 @@ interceptant à distance les [OBSTACLE_AGRESSIF] avec votre rayon laser.
 ---
 
 - ### **Travail fait**
+
+Nous avons réalisé ce projet en plusieurs parties. Nous nous sommes d'abord intéressés à la création des sprites des vaisseaux, obstacles, missiles, etc. Ensuite nous avons entammé le processus de programmation, qui s'est avéré très laborieux du fait que notre code source est divisé en 4 fichiers header (.h), 1 fichier source (.cpp) et in fichier arduino (.ino). Ce faisant, le code est plus lisible mais le compilateur ainsi qu'intelli-sense (autocomplétion) nous ont posé beaucoup de problèmes, ralentissant notre progression.
+
+Nous avons mis en place un système d'objets, avec des classes pour les entités, des constructeurs et de l'héritage entre les classes. Le jeu comporte donc le joueur, des obstacles indestructibles et agressifs. S'il est touché par un obstacle agressif le joueur perd 1 point de vie et s'il en détruit 1 il gagne des points. De plus il est aussi possible de récupérer des humains pour augmenter son score. Les obstacles et bonus apparaissent aléatoirement au fur et à mesure de la partie.
