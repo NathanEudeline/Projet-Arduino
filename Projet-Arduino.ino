@@ -5,6 +5,8 @@
 #include "structs.h"
 #include "texture.h"
 
+#define LED_BLEUE 3
+
 void renderMenu();
 void renderOver();
 void renderHUD(Player player);
@@ -38,6 +40,8 @@ void setup()
 
     attachInterrupt(digitalPinToInterrupt(2), movePlayer, FALLING);
     attachInterrupt(digitalPinToInterrupt(1), playerShoot, FALLING);
+
+    pinMode(LED_BLEUE, OUTPUT);
 }
 
 void loop()
@@ -58,8 +62,16 @@ void loop()
         }
         list.updateEntities(&player, millis(), difficulty);
 
-        if (player.hp <= 0)
-            gameState = DEAD;
+        if (player.hp <= 1)
+        {
+            digitalWrite(LED_BLEUE, HIGH);
+            if (player.hp <= 0)
+                gameState = DEAD;
+        }
+        else
+        {
+            digitalWrite(LED_BLEUE, LOW);
+        }
 
         player.render(lcd);
         list.renderEntities(lcd);
