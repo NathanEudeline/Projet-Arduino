@@ -1,7 +1,7 @@
 {
-    "configuration": "cpu=atmega328",
     "board": "arduino:avr:diecimila",
     "programmer": "arduino:avrisp",
-    "port": "COM9",
-    "sketch": "Projet-Arduino.ino"
+    "port": "COM12",
+    "sketch": "Projet-Arduino.ino",
+    "configuration": "cpu=atmega328"
 }

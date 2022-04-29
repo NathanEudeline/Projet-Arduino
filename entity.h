@@ -2,7 +2,7 @@
 #include "structs.h"
 #include "game.h"
 
-#define MAX_ENTITY 10
+#define MAX_ENTITIES 10
 
 class Entity // Classe de base des entités
 {
@@ -33,7 +33,7 @@ public:
         this->attaque = false;
     }
 
-    void move();
+    void move(bool a);
     void shoot();
 };
 
@@ -46,13 +46,13 @@ public:
     bool attaque;
     unsigned long lastMove;
 
-    SpaceEntity(vec2 pos, ModelId modelId, EntityType type, bool direction) : Entity(pos, modelId)
+    SpaceEntity(vec2 pos, ModelId modelId, EntityType type, bool direction, unsigned long time) : Entity(pos, modelId)
     {
         this->id = rand();
         this->direction = direction;
         this->type = type;
         this->attaque = false;
-        this->lastMove = 0;
+        this->lastMove = time;
     }
     SpaceEntity();
 
@@ -63,11 +63,11 @@ public:
 
 class SpaceList // Contient les SpaceEntity actives
 {
-private:
-    int size;
-    SpaceEntity *list[MAX_ENTITY];
 
 public:
+    SpaceEntity *list[MAX_ENTITIES];
+    int size;
+
     SpaceList()
     {
         this->size = 0;
@@ -77,7 +77,7 @@ public:
 
     void removeEntity(SpaceEntity *entity);
 
-    void updateEntities(Player *player, unsigned long millis, double diff);
+    void updateEntities(Player *player, unsigned long millis, double diff, LiquidCrystal lcd);
 
     void renderEntities(LiquidCrystal lcd);
 };

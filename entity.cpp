@@ -16,10 +16,10 @@ void Entity::render(LiquidCrystal lcd)
     lcd.write(this->modelId);
 }
 
-void Player::move()
+void Player::move(bool a)
 {
     this->previousPos = this->pos; // on stocke la pos précédente avant de bouger
-    this->pos.y = (this->pos.y == 1) ? 0 : 1;
+    this->pos.y = (a) ? 1 : 0;
 }
 
 void Player::shoot()
@@ -35,19 +35,21 @@ void SpaceEntity::move()
 
 void SpaceEntity::update(unsigned long millis, double diff)
 {
-    if (this->type != MISSILE_TYPE && this->lastMove + (rand() % 1000) + 5000 * diff > millis)
+    if (this->type != MISSILE_TYPE && (this->lastMove + (rand() % 5000) + 1000 * diff) < millis)
     {
         this->move();
+        this->lastMove = millis;
+
         if (this->type == ENNEMI_TYPE && millis % 2 == 0)
         {
             this->attaque = true;
         }
     }
-    if (this->type == MISSILE_TYPE && this->lastMove + (rand() % 500) + 3000 > millis)
+    if (this->type == MISSILE_TYPE && (this->lastMove + (rand() % 3000) + 500) < millis)
     {
         this->move();
+        this->lastMove = millis;
     }
-    this->lastMove = millis;
 }
 
 bool SpaceEntity::testCol(Entity entity)
@@ -55,14 +57,18 @@ bool SpaceEntity::testCol(Entity entity)
     return (this->pos.x == entity.pos.x && this->pos.y == entity.pos.y);
 }
 
-void SpaceList::updateEntities(Player *player, unsigned long millis, double diff)
+void SpaceList::updateEntities(Player *player, unsigned long millis, double diff, LiquidCrystal lcd)
 {
     for (int i = 0; i < this->size; i++) // On boucle sur tt les entité du tableau
     {
         SpaceEntity *entity = this->list[i];
+
         entity->update(millis, diff); // on update l'entité
-        if (entity->pos.x < 0)        // On la vire si elle sort du jeu en on continue pas la logique
+
+        if (entity->pos.x < 0) // On la vire si elle sort du jeu en on continue pas la logique
         {
+            lcd.setCursor(entity->pos.x, entity->pos.y);
+            lcd.print(" ");
             this->removeEntity(entity);
             continue;
         }
@@ -70,8 +76,10 @@ void SpaceList::updateEntities(Player *player, unsigned long millis, double diff
         if (entity->attaque) // si l'entité a son attaque en true on spawn un missile
         {
             entity->attaque = false;
-            this->addEntity(&SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true));
+            SpaceEntity *missile = new SpaceEntity({entity->pos.x - 1, entity->pos.y}, MISSILE_MODEL, MISSILE_TYPE, true, millis);
+            this->addEntity(missile);
         }
+
         if (entity->testCol(*player))
         {
             if (entity->type == POINT_TYPE)
@@ -82,6 +90,11 @@ void SpaceList::updateEntities(Player *player, unsigned long millis, double diff
             {
                 player->hp--;
             }
+
+            lcd.setCursor(entity->previousPos.x, entity->previousPos.y);
+            lcd.print(" ");
+            this->removeEntity(entity);
+            continue;
         }
 
         if (entity->type == MISSILE_TYPE)
@@ -97,11 +110,18 @@ void SpaceList::updateEntities(Player *player, unsigned long millis, double diff
                 {
                     if (entityBis->type != OBSTACLE_TYPE)
                     {
+                        lcd.setCursor(entity->previousPos.x, entity->previousPos.y);
+                        lcd.print(" ");
                         this->removeEntity(entity);
                     }
                     else
                     {
+                        lcd.setCursor(entityBis->previousPos.x, entityBis->previousPos.y);
+                        lcd.print(" ");
                         this->removeEntity(entityBis);
+
+                        lcd.setCursor(entity->previousPos.x, entity->previousPos.y);
+                        lcd.print(" ");
                         this->removeEntity(entity);
                     }
                     break;
@@ -122,7 +142,11 @@ void SpaceList::renderEntities(LiquidCrystal lcd)
 
 void SpaceList::addEntity(SpaceEntity *entity)
 {
-    this->list[this->size] = entity;
+    if (this->size < MAX_ENTITIES)
+    {
+        this->list[this->size] = entity;
+        this->size++;
+    }
 }
 
 void SpaceList::removeEntity(SpaceEntity *entity)
@@ -137,7 +161,7 @@ void SpaceList::removeEntity(SpaceEntity *entity)
             }
             else
             {
-                for (int j = i; j < this->size; j++)
+                for (int j = i; j < this->size - 1; j++)
                 {
                     this->list[j] = this->list[j + 1];
                 }

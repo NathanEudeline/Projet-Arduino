@@ -19,17 +19,19 @@ LiquidCrystal lcd(15, 14, 4, 5, 6, 7);
 Player player = Player({0, 0}, 0, 3);
 SpaceList list = SpaceList();
 
+unsigned long lastShot = 0;
 unsigned long lastSpawnTime = 0;
 double difficulty = 1;
-int brouillard = 0;
+unsigned long brouillard = 0;
 
 void setup()
 {
     // Arduino declaration //
     lcd.begin(16, 2);
+    Serial.begin(9600);
 
     // Création des textures //
-    lcd.createChar(PLAYER_MODEL, vaisseau0);
+    lcd.createChar(PLAYER_MODEL, vaisseau2);
     lcd.createChar(OBSTACLE_MODEL, obstacle);
     lcd.createChar(ENEMY_MODEL, ennemirepos);
     lcd.createChar(POINT_MODEL, humain);
@@ -38,29 +40,58 @@ void setup()
     lcd.createChar(EXPLOSION_MODEL, explo1);
     lcd.createChar(MISSILE_MODEL, tirEn1);
 
-    attachInterrupt(digitalPinToInterrupt(2), movePlayer, FALLING);
-    attachInterrupt(digitalPinToInterrupt(1), playerShoot, FALLING);
+    attachInterrupt(digitalPinToInterrupt(2), playerShoot, FALLING);
+    // attachInterrupt(digitalPinToInterrupt(8), playerShoot, FALLING);
 
+    pinMode(9, INPUT);
+    pinMode(8, INPUT);
     pinMode(LED_BLEUE, OUTPUT);
 }
 
 void loop()
 {
+    // unsigned long voltage = analogRead(3);
+
     brouillard = analogRead(3) / 113;
+    // // 113;
+    // lcd.setCursor(1, 0);
+    // lcd.print(voltage);
+
     if (gameState == ACCUEIL)
     {
-        renderMenu();
+        ecranD();
     }
 
     if (gameState == PLAY)
     {
-        difficulty += 0.01;
+        // lcd.setCursor(1, 0);
+        // lcd.print(list.list[0]->id);
+        // lcd.setCursor(1, 1);
+        // lcd.print(list.size);
+        if (difficulty == 1)
+            lcd.clear();
+        difficulty += 0.0001;
+        // lcd.setCursor(1, 0);
+        // lcd.print(difficulty);
+
+        if (digitalRead(8) == LOW)
+        {
+            player.move(0);
+        }
+        else if (digitalRead(9) == LOW)
+        {
+            player.move(1);
+        }
+
         if (player.attaque)
         {
             player.attaque = false;
-            list.addEntity(&SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false));
+            lcd.createChar(PLAYER_MODEL, vaisseau1);
+            SpaceEntity *missile;
+            missile = new SpaceEntity({player.pos.x + 1, player.pos.y}, MISSILE_MODEL, MISSILE_TYPE, false, millis());
+            list.addEntity(missile);
         }
-        list.updateEntities(&player, millis(), difficulty);
+        list.updateEntities(&player, millis(), difficulty, lcd);
 
         if (player.hp <= 1)
         {
@@ -87,11 +118,17 @@ void loop()
 
     if (gameState == DEAD)
     {
-        renderOver();
+
+        restart();
+        ecranF(player.score);
+        player.hp = 3;
+        player.score = 0;
+        list.size = 0;
+        gameState = ACCUEIL;
     }
 }
 
-void movePlayer()
+void playerShoot()
 {
     if (gameState == ACCUEIL)
     {
@@ -100,83 +137,125 @@ void movePlayer()
     }
     else if (gameState == PLAY)
     {
-        player.move();
-    }
-    else if (gameState == DEAD)
-    {
-        gameState = ACCUEIL;
+        if (lastShot + 4000 < millis())
+        {
+            lastShot = millis();
+            player.shoot();
+        }
     }
 }
 
-void playerShoot()
+void ecranD()
 {
-    player.shoot();
+    delay(2000);
+    lcd.clear();
+    for (byte i = 5; i < 11; i++)
+    {
+        lcd.setCursor(i - 5, 0);
+        lcd.print(" SPACE");
+        delay(100);
+    }
+    for (byte i = 0; i < 11; i++)
+    {
+        lcd.setCursor(15 - i, 1);
+        lcd.print("INVADER ");
+        delay(100);
+    }
+    // lcd.clear();
 }
 
-void renderMenu()
+void ecranF(int score)
 {
     lcd.clear();
-    char text[4] = {'P', 'L', 'A', 'Y'};
-
-    for (int i = 0; i < 4; i++)
-    {
-        lcd.setCursor(i, 0);
-        lcd.print(text[i]);
-        delay(200);
-    }
-
-    lcd.setCursor(5, 1);
-    lcd.write(PLAYER_MODEL);
+    lcd.setCursor(0, 0);
+    lcd.print("SCORE :");
+    lcd.print(score);
+    delay(5000);
 }
 
-void renderOver()
+void restart()
 {
     lcd.clear();
-    lcd.print("Miskin");
+    lcd.setCursor(2, 0);
+    lcd.print(" ");
+    delay(200);
+    lcd.setCursor(3, 0);
+    lcd.print("G");
+    delay(200);
+    lcd.setCursor(4, 1);
+    lcd.print("A");
+    delay(200);
+    lcd.setCursor(5, 0);
+    lcd.print("M");
+    delay(200);
+    lcd.setCursor(6, 1);
+    lcd.print("E");
+    delay(200);
+    lcd.setCursor(7, 0);
+    lcd.print(" ");
+    lcd.setCursor(8, 0);
+    lcd.print("O");
+    delay(200);
+    lcd.setCursor(9, 1);
+    lcd.print("V");
+    delay(200);
+    lcd.setCursor(10, 0);
+    lcd.print("E");
+    delay(200);
+    lcd.setCursor(11, 1);
+    lcd.print("R");
+    delay(200);
+    lcd.setCursor(12, 0);
+    lcd.print("!");
+    delay(5000);
+    lcd.clear();
 }
 
 void renderHUD(Player player)
 {
-    int lastHp = 0, lastScore = 0;
-    if (player.hp != lastHp)
-    {
-        int nbEmpty = 3 - player.hp;
-        for (int i = 0; i < 3; i++)
-        {
-            lcd.setCursor(13 + i, 0);
-            lcd.print((i <= nbEmpty) ? HEART_FULL_MODEL : HEART_EMPTY_MODEL);
-        }
 
-        lastHp = player.hp;
-    }
-    if (player.score != lastScore)
+    int nbEmpty = 3 - player.hp;
+    for (int i = 0; i < 3; i++)
     {
-        lcd.setCursor(13, 1);
-        lcd.print(player.score);
-
-        lastScore = player.score;
+        lcd.setCursor(13 + i, 0);
+        lcd.write((i >= nbEmpty) ? HEART_FULL_MODEL : HEART_EMPTY_MODEL);
     }
+    lcd.setCursor(13, 1);
+    lcd.print(player.score);
 }
 
-void entitySpawner(SpaceList *list)
+void entitySpawner(SpaceList *list) //
 {
+    if (list->size > 9)
+    {
+        return;
+    }
+
+    Serial.print(list->size);
+    Serial.print(" : ");
+    for (int i = 0; i < list->size; i++)
+    {
+        Serial.println(list->list[i]->id);
+    }
+    Serial.print("\n");
+
     int rando = rand() % 3;
-    SpaceEntity newEntity = SpaceEntity({12, rand() % 2}, OBSTACLE_MODEL, OBSTACLE_TYPE, true);
+    SpaceEntity *tmp;
     switch (rando)
     {
     case 0:
-        newEntity = SpaceEntity({12, rand() % 2}, OBSTACLE_MODEL, OBSTACLE_TYPE, true);
+        tmp = new SpaceEntity({12, rand() % 2}, OBSTACLE_MODEL, OBSTACLE_TYPE, true, millis());
         break;
     case 1:
-        newEntity = SpaceEntity({12, rand() % 2}, ENEMY_MODEL, ENNEMI_TYPE, true);
+        tmp = new SpaceEntity({12, rand() % 2}, ENEMY_MODEL, ENNEMI_TYPE, true, millis());
         break;
     case 2:
-        newEntity = SpaceEntity({12, rand() % 2}, POINT_MODEL, POINT_TYPE, true);
+        tmp = new SpaceEntity({12, rand() % 2}, POINT_MODEL, POINT_TYPE, true, millis());
         break;
     default:
         break;
     }
-    list->addEntity(&newEntity);
+    list->addEntity(tmp);
 }
 
 void renderFog(int fog)
@@ -184,8 +263,8 @@ void renderFog(int fog)
     for (int i = 12; i > 12 - fog; i--)
     {
         lcd.setCursor(i, 0);
-        lcd.print(177);
+        lcd.write(177);
         lcd.setCursor(i, 1);
-        lcd.print(177);
+        lcd.write(177);
     }
 }

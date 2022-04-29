@@ -105,22 +105,27 @@ interceptant à distance les [OBSTACLE_AGRESSIF] avec votre rayon laser.
   - [x] Dimitri
   - [x] Lucas
 
----
-
-- ### **Pensée**
-
-  - Game design :  
-
-  qdqdq
-
-  - Dev :  
-  
-  qdqdq
 
 ---
 
 - ### **Travail fait**
 
-Nous avons réalisé ce projet en plusieurs parties. Nous nous sommes d'abord intéressés à la création des sprites des vaisseaux, obstacles, missiles, etc. Ensuite nous avons entammé le processus de programmation, qui s'est avéré très laborieux du fait que notre code source est divisé en 4 fichiers header (.h), 1 fichier source (.cpp) et in fichier arduino (.ino). Ce faisant, le code est plus lisible mais le compilateur ainsi qu'intelli-sense (autocomplétion) nous ont posé beaucoup de problèmes, ralentissant notre progression.
+Nous avons réalisé ce projet en plusieurs parties. Nous nous sommes d'abord intéressés à la création des sprites des vaisseaux, obstacles, missiles, etc. Ensuite, nous avons entammé le processus de programmation, qui s'est avéré très laborieux du fait que notre code source est divisé en 4 fichiers header (.h), 1 fichier source (.cpp) et in fichier arduino (.ino). Ce faisant, le code est plus lisible mais le compilateur ainsi qu'intelli-sense (autocomplétion) nous ont posé beaucoup de problèmes, ralentissant notre progression.
 
-Nous avons mis en place un système d'objets, avec des classes pour les entités, des constructeurs et de l'héritage entre les classes. Le jeu comporte donc le joueur, des obstacles indestructibles et agressifs. S'il est touché par un obstacle agressif le joueur perd 1 point de vie et s'il en détruit 1 il gagne des points. De plus il est aussi possible de récupérer des humains pour augmenter son score. Les obstacles et bonus apparaissent aléatoirement au fur et à mesure de la partie.
+Nous avons crée et utilisé des objets c++, avec des classes pour les entités, des constructeurs et de l'héritage entre les classes. Le jeu comporte donc le joueur, des obstacles indestructibles et agressifs. S'il est touché par un obstacle agressif le joueur perd 1 point de vie. De plus il est aussi possible de récupérer des humains pour augmenter son score. Les obstacles et bonus apparaissent aléatoirement au fur et à mesure de la partie.
+
+
+
+Tous les designs de notre jeu ont été imaginés de sorte à le rendre aussi attrayant qu’intuitif.
+
+Nous avons tout d’abord pensé au design du vaisseau. Sa forme triangulaire indique clairement l’avant du vaisseau du fait de sa pointe (_qui s’agrandit lors du rechargement du canon_) **Pas implémenté**, mais également l’arrière, grâce au design pensé pour faire des propulseurs.
+
+Nous devions faire un ennemi qui tire. De ce fait, nous avons fait un alien tentaculaire (_alternant la position de ses tentacules du haut avec celles du bas afin de donner une logique dans son déplacement_) **Pas implémenté**. Nous l’avons pensé avec des yeux au centre de sa forme afin de le rendre facilement identifiable par le joueur. Les tirs de l’alien ont été fait en forme d’éclair pour accentuer le côté extraterrestre mais également permettre au joueur d’identifier clairement et rapidement ses tirs des tirs ennemis.
+
+À présent, qui dit ennemi qui tire dit également ami à sauver. Or, comme nous sommes un héros de la Terre luttant contre des aliens, nous avons pensé à sauver ses pauvres terriens kidnappés par les terribles aliens. En effet, les humains sont l’objectif à sauver afin de gagner des points, la forme humaine ainsi que _les mouvements d’appels à l’aide_ (**Pas implémentés**) sont là pour les différencier facilement du reste et surtout à ne pas les confondre avec les ennemis.
+
+Il nous fallait à présent un obstacle à esquiver et quoi de mieux qu’un satellite ? En effet, notre héro terrien élimine les terribles aliens en orbite autour de la Terre mais, il faut faire attention à ne pas détruire ou se crasher sur les satellites sinon, plus d’émissions à la télévision, plus de 4G, plus d’internet, bref, l’apocalypse. C’est pourquoi, le satellite est un choix évident pour que le joueur sache intuitivement qu’il faut les esquiver et non les détruire.
+
+_(Comment savoir que l’on a bien éliminé un ennemi ? En le voyant exploser à cause de notre tir de canon ainsi, le joueur a la certitude que l’alien est bien mort (ou l’humain s’il fait un mauvais tir) s’il ne le voit pas mort or, l’explosion est parfaite pour cela.)_ **Pas implémenté**
+
+Enfin, nous avons mis un tableau des scores pour vous pousser à vous améliorer à chaque partie, mais également à avoir ce sentiment d’accomplissement d’avoir fait mieux qu’avant. Nous avons aussi mis des vies en forme de cœur car, même si cela est très classique, ça reste très efficace et nous n’avions pas assez de pixels pour vraiment faire mieux.
